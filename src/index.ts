@@ -75,7 +75,6 @@ export class LinkChecker extends EventEmitter {
    */
   async check(opts: CheckOptions) {
     const options = await processOptions(opts);
-    console.error(JSON.stringify(options));
     if (!Array.isArray(options.path)) {
       options.path = [options.path];
     }
