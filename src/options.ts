@@ -25,6 +25,7 @@ export interface CheckOptions {
   retryErrorsCount?: number;
   retryErrorsJitter?: number;
   urlRewriteExpressions?: UrlRewriteExpression[];
+  headers?: {};
 }
 
 export interface InternalCheckOptions extends CheckOptions {

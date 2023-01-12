@@ -10,7 +10,6 @@ import {
   LinkState,
   LinkChecker,
   CheckOptions,
-  headers,
 } from '../src/index.js';
 
 nock.disableNetConnect();
@@ -438,7 +437,10 @@ describe('linkinator', () => {
     );
   });
 
-  it('should always send a human looking User-Agent', async () => {
+  it('should always send a human the supplied headers', async () => {
+    const headers = {
+      "User-Agent": "Some Value"
+    }
     const scopes = [
       nock('http://fake.local')
         .get('/', undefined, {reqheaders: headers})
@@ -453,6 +455,7 @@ describe('linkinator', () => {
     ];
     const results = await check({
       path: 'http://fake.local',
+      headers: headers
     });
     assert.ok(results.passed);
     scopes.forEach(x => x.done());

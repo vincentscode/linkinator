@@ -19,6 +19,7 @@ export interface Flags {
   retryErrorsJitter?: number;
   urlRewriteSearch?: string;
   urlRewriteReplace?: string;
+  headers?: any;
 }
 
 export async function getConfig(flags: Flags) {

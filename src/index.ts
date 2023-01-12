@@ -55,13 +55,8 @@ interface CrawlOptions {
   retryErrors: boolean;
   retryErrorsCount: number;
   retryErrorsJitter: number;
+  headers?: any;
 }
-
-// Spoof a normal looking User-Agent to keep the servers happy
-export const headers = {
-  'User-Agent':
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
-};
 
 export declare interface LinkChecker {
   on(event: 'link', listener: (result: LinkResult) => void): this;
@@ -80,6 +75,7 @@ export class LinkChecker extends EventEmitter {
    */
   async check(opts: CheckOptions) {
     const options = await processOptions(opts);
+    console.error(JSON.stringify(options));
     if (!Array.isArray(options.path)) {
       options.path = [options.path];
     }
@@ -119,6 +115,9 @@ export class LinkChecker extends EventEmitter {
     const initCache: Set<string> = new Set();
     const delayCache: Map<string, number> = new Map();
     const retryErrorsCache: Map<string, number> = new Map();
+    const headers = options.headers || {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36',
+    };
 
     for (const path of options.path) {
       const url = new URL(path);
@@ -138,6 +137,7 @@ export class LinkChecker extends EventEmitter {
           retryErrors: !!opts.retryErrors,
           retryErrorsCount: opts.retryErrorsCount ?? 5,
           retryErrorsJitter: opts.retryErrorsJitter ?? 3000,
+          headers: headers,
         });
       });
     }
@@ -245,7 +245,7 @@ export class LinkChecker extends EventEmitter {
       res = await request<Readable>({
         method: opts.crawl ? 'GET' : 'HEAD',
         url: opts.url.href,
-        headers,
+        headers: opts.headers,
         responseType: 'stream',
         validateStatus: () => true,
         timeout: opts.checkOptions.timeout,
@@ -259,7 +259,7 @@ export class LinkChecker extends EventEmitter {
         res = await request<Readable>({
           method: 'GET',
           url: opts.url.href,
-          headers,
+          headers: opts.headers,
           responseType: 'stream',
           validateStatus: () => true,
           timeout: opts.checkOptions.timeout,
@@ -286,7 +286,7 @@ export class LinkChecker extends EventEmitter {
           url: opts.url.href,
           responseType: 'stream',
           validateStatus: () => true,
-          headers,
+          headers: opts.headers,
           timeout: opts.checkOptions.timeout,
         });
         if (this.shouldRetryAfter(res, opts)) {
